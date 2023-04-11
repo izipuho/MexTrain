@@ -40,24 +40,24 @@ class tile:
         return(f'Tile {self.numbers} scores {self.score} points.')
 
 class tile_set:
-    #tl = tile(in_max_tile)
     def __init__(self):
-        self.in_max_tile = [self.tl.max_tile, self.tl.max_tile]
-        #self.tile_set = self.create()
-        self.ts = self.create()
+        self.max_tile = [in_max_tile, in_max_tile]
+        self.set = []
+        self.create()
+        print(self)
 
     def create(self):
-        tile_set = []
-        for t in range(self.tl.max_tile, -1, -1):
+        for t in range(in_max_tile, -1, -1):
             for i in range(t, -1, -1):
-               tile = [t, i]
-               tile_set.append(tile)
-        random.shuffle(tile_set)
-        return(tile_set)
+                tl = tile([t,i])
+                #print(tl)
+                self.set.append(tl)
+        random.shuffle(self.set)
 
     def __str__(self):
-        return(f'Got {len(self.ts)} tiles in set with {self.in_max_tile} highest.')
+        return(f'Got {len(self.set)} tiles in set with {in_max_tile} highest.')
 
+#TODO messed up with tile set
 class table:
     def __init__(self, players):
         self.players = players 
@@ -276,7 +276,7 @@ class game:
 #gm = game(pl)
 #gm.end_game()
 
-#tbl = table(in_players_count)
+tbl = table(in_players_count)
 #tbl.deal(12)
 #r = game_round(tbl, in_max_tile)
 #for p in range(1, in_players_count+1):
@@ -287,16 +287,3 @@ class game:
 #r.move(4)
 #print(tbl.table)
 #r.calc_hands()
-
-a = tile([0,1])
-b = tile([0,0])
-c = tile([2,1])
-d = tile([2,10])
-e = tile([3,4])
-
-a.is_double()
-b.is_double()
-c.flip()
-print(c)
-print(e.is_suitable(4), e)
-print(b)
