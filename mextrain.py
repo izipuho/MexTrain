@@ -2,29 +2,37 @@
 import random
 import json
 
-#max_tile = int(input('What is the maximum tile: '))
-#pl = int(input('How much players are we awaiting: '))
-#dfct = input('What is the difficulty: ')
-max_tile = 12
-pl = 4
-dfct = 'normal'
+#in_max_tile = int(input('What is the maximum tile: '))
+#in_players_count = int(input('How much players are we awaiting: '))
+#in_difficulty = input('What is the difficulty: ')
+in_max_tile = 12
+in_players_count = 4
+in_difficulty = 'normal'
 # define tile
 class tile:
-    #TODO set dynamic tiles
-    def __init__(self, max_count):
-        self.max_count = max_count
-        return
+    max_tile = in_max_tile
+    def __init__(self, numbers):
+        self.numbers = numbers
+
+    def is_double(self):
+        if self.numbers[0] == self.nubmers[1]:
+            return(True)
+        else:
+            return(False)
+
+    def flip(self):
+        self.numbers = [self.numbers[1], self.numbers[0]]
 
 class tile_set:
-    tl = tile(max_tile)
+    tl = tile(in_max_tile)
     def __init__(self):
-        self.max_tile = [self.tl.max_count, self.tl.max_count]
+        self.in_max_tile = [self.tl.max_tile, self.tl.max_tile]
         #self.tile_set = self.create()
         self.ts = self.create()
 
     def create(self):
         tile_set = []
-        for t in range(self.tl.max_count, -1, -1):
+        for t in range(self.tl.max_tile, -1, -1):
             for i in range(t, -1, -1):
                tile = [t, i]
                tile_set.append(tile)
@@ -32,7 +40,7 @@ class tile_set:
         return(tile_set)
 
     def __str__(self):
-        return(f'Got {len(self.ts)} tiles in set with {self.max_tile} highest.')
+        return(f'Got {len(self.ts)} tiles in set with {self.in_max_tile} highest.')
 
 class table:
     def __init__(self, players):
@@ -40,7 +48,7 @@ class table:
         self.ts = tile_set()
         self.table_tile_cnt = len(self.ts.ts)
         # set hand tile_count
-        self.hand_tile_cnt = max_tile#12
+        self.hand_tile_cnt = in_max_tile#12
         if self.players == 2:
             self.hand_tile_cnt += 3
         print(self.ts)
@@ -233,11 +241,11 @@ class game:
         self.players = players
         self.tbl = table(self.players)
         self.first_player = randint(1, 4)
-        for rnd in range(max_tile, -1, -1):
+        for rnd in range(in_max_tile, -1, -1):
             #print(self.tbl)
             r = game_round(self.tbl, rnd)
             for p in range(1, self.players+1):
-                r.init_trail(p, dfct)
+                r.init_trail(p, in_difficulty)
             r.calc_hands()
 
     def end_game(self):
@@ -252,11 +260,11 @@ class game:
 #gm = game(pl)
 #gm.end_game()
 
-tbl = table(pl)
+tbl = table(in_players_count)
 #tbl.deal(12)
-r = game_round(tbl, max_tile)
-for p in range(1, pl+1):
-    trl = r.init_trail(p, dfct)
+r = game_round(tbl, in_max_tile)
+for p in range(1, in_players_count+1):
+    trl = r.init_trail(p, in_difficulty)
 r.move(1)
 r.move(2)
 r.move(3)
