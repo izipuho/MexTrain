@@ -10,21 +10,37 @@ in_players_count = 4
 in_difficulty = 'normal'
 # define tile
 class tile:
-    max_tile = in_max_tile
     def __init__(self, numbers):
         self.numbers = numbers
+        self.score = sum(numbers)
+        if self.score == 0:
+            self.score = 25
 
     def is_double(self):
-        if self.numbers[0] == self.nubmers[1]:
+        if self.numbers[0] == self.numbers[1]:
+            print(f'{self.numbers} is double.')
+            return(True)
+        else:
+            print(f'{self.numbers} not a double.')
+            return(False)
+
+    def flip(self):
+        print(f'Tile {self.numbers} will be fliped to {[self.numbers[1], self.numbers[0]]}')
+        self.numbers.reverse()
+
+    def is_suitable(self, number):
+        if number in self.numbers:
+            if number == self.numbers[1]:
+                self.flip()
             return(True)
         else:
             return(False)
 
-    def flip(self):
-        self.numbers = [self.numbers[1], self.numbers[0]]
+    def __str__(self):
+        return(f'Tile {self.numbers} scores {self.score} points.')
 
 class tile_set:
-    tl = tile(in_max_tile)
+    #tl = tile(in_max_tile)
     def __init__(self):
         self.in_max_tile = [self.tl.max_tile, self.tl.max_tile]
         #self.tile_set = self.create()
@@ -260,15 +276,27 @@ class game:
 #gm = game(pl)
 #gm.end_game()
 
-tbl = table(in_players_count)
+#tbl = table(in_players_count)
 #tbl.deal(12)
-r = game_round(tbl, in_max_tile)
-for p in range(1, in_players_count+1):
-    trl = r.init_trail(p, in_difficulty)
-r.move(1)
-r.move(2)
-r.move(3)
-r.move(4)
-print(tbl.table)
+#r = game_round(tbl, in_max_tile)
+#for p in range(1, in_players_count+1):
+#    trl = r.init_trail(p, in_difficulty)
+#r.move(1)
+#r.move(2)
+#r.move(3)
+#r.move(4)
+#print(tbl.table)
 #r.calc_hands()
 
+a = tile([0,1])
+b = tile([0,0])
+c = tile([2,1])
+d = tile([2,10])
+e = tile([3,4])
+
+a.is_double()
+b.is_double()
+c.flip()
+print(c)
+print(e.is_suitable(4), e)
+print(b)
