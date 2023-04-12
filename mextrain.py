@@ -37,25 +37,34 @@ class tile:
             return(False)
 
     def __str__(self):
+        return(f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]')
+
+    def __repr__(self):
         return(f'Tile {self.numbers} scores {self.score} points.')
 
 class tile_set:
     def __init__(self):
         self.max_tile = in_max_tile#[in_max_tile, in_max_tile]
         self.set = []
+        self.set_repr = str()
         self.create()
         print(self)
 
     def create(self):
         for t in range(in_max_tile, -1, -1):
             for i in range(t, -1, -1):
-                tl = tile([t,i])
+                tl = tile((t,i))
                 #print(tl)
                 self.set.append(tl)
-        random.shuffle(self.set)
+                self.set_repr += str(tl) + ' '
+            self.set_repr += '\n'
+        #random.shuffle(self.set)
 
     def __str__(self):
         return(f'Got set of {len(self.set)} tiles with {self.max_tile} highest.')
+
+    def __repr__(self):
+        return(self.set_repr)
 
 #TODO messed up with tile set
 class table:
@@ -278,7 +287,8 @@ class game:
 
 #ts = tile_set()
 tbl = table(in_players_count)
-tbl.deal(12)
+print(repr(tbl.tile_set))
+#tbl.deal(12)
 #r = game_round(tbl, in_max_tile)
 #for p in range(1, in_players_count+1):
 #    trl = r.init_trail(p, in_difficulty)
