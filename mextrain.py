@@ -12,7 +12,7 @@ in_difficulty = 'normal'
 class tile:
     def __init__(self, numbers):
         self.numbers = numbers
-        self.code = f'{numbers[0]}-{numbers[1]}}'
+        self.code = f'{numbers[0]}-{numbers[1]}'
         self.text = f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
         self.text_flipped = f'[{self.numbers[1]:>2}|{self.numbers[0]:>2}]'
         self.score = sum(numbers)
@@ -56,9 +56,9 @@ class tile_set:
     def create(self):
         for t in range(in_max_tile, -1, -1):
             for i in range(t, -1, -1):
-                tl = tile((t,i))
+                tl = tile([t,i])
                 #print(tl)
-                self.set[(t,i)] = tl
+                self.set[tl.code] = tl
                 self.set_repr += str(tl) + ' '
             self.set_repr += '\n'
         #random.shuffle(self.set)
@@ -85,12 +85,13 @@ class table:
         for p in range(1, self.players+1):
             self.scores[p] = 0
         self.scores['Table'] = 0
-        self.table = dict()
+        self.layout = dict()
 
     def deal(self, round):
         tile_set = self.tile_set.set.copy()
-        # remove start tile
-        tile_set.remove(tile([round, round]))
+        # Remove start tile. Ugly: not by tile class. MayBe TODO
+        del tile_set[f'{round}-{round}']
+        ##tile_set.remove(tile([round, round]))
         # init hands
         hands = dict()
         trails = dict() 
@@ -105,18 +106,18 @@ class table:
                 ##n = random.randint(0, len(tile_set)-1)
                 #print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
                 ##hands[p].append(tile_set[n])
-                hands[p].append(random.choice(list(tile_set.values())))
+                tl = random.choice(list(tile_set.values()))
+                hands[p].append(tl)
                 # delete it from set
-                ##del tile_set[n]
+                del tile_set[tl.code]
         hands['Table'] = tile_set
         table_tile_cnt = len(hands['Table'])
         print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players. Got {table_tile_cnt} tiles left on table and {[round, round]} is strating tile.\n')
-        self.table = {'hands': hands, 'trails': trails, 'moves': 0}
+        self.layout = {'hands': hands, 'trails': trails, 'moves': 0}
 
     def __str__(self):
         #return(f'Got set of {self.table_tile_cnt} tiles.')
         pass
-
 
 class game_round:
     def __init__(self, table, round_num):
@@ -285,6 +286,7 @@ class game:
                 print(f'{i} place. Player {k} scores {final_scores[k]}.')
             i += 1
 
-a = tile((1,2))
-print(a)
-a.flip()
+tbl = table(in_players_count)
+print(repr(tbl.tile_set))
+tbl.deal(1)
+print(tbl.layout)
