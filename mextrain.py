@@ -12,6 +12,9 @@ in_difficulty = 'normal'
 class tile:
     def __init__(self, numbers):
         self.numbers = numbers
+        self.code = f'{numbers[0]}-{numbers[1]}}'
+        self.text = f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
+        self.text_flipped = f'[{self.numbers[1]:>2}|{self.numbers[0]:>2}]'
         self.score = sum(numbers)
         if self.score == 0:
             self.score = 25
@@ -25,7 +28,7 @@ class tile:
             return(False)
 
     def flip(self):
-        print(f'Tile {self.numbers} will be fliped to {[self.numbers[1], self.numbers[0]]}')
+        print(f'Tile {self.text} will be fliped to {self.text_flipped}')
         self.numbers.reverse()
 
     def is_suitable(self, number):
@@ -45,7 +48,7 @@ class tile:
 class tile_set:
     def __init__(self):
         self.max_tile = in_max_tile#[in_max_tile, in_max_tile]
-        self.set = []
+        self.set = dict()
         self.set_repr = str()
         self.create()
         print(self)
@@ -55,7 +58,7 @@ class tile_set:
             for i in range(t, -1, -1):
                 tl = tile((t,i))
                 #print(tl)
-                self.set.append(tl)
+                self.set[(t,i)] = tl
                 self.set_repr += str(tl) + ' '
             self.set_repr += '\n'
         #random.shuffle(self.set)
@@ -99,11 +102,12 @@ class table:
         for t in range(0, self.hand_tile_cnt):
             for p in range(1, self.players+1):
                 # get random tile
-                n = random.randint(0, len(tile_set)-1)
+                ##n = random.randint(0, len(tile_set)-1)
                 #print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
-                hands[p].append(tile_set[n])
+                ##hands[p].append(tile_set[n])
+                hands[p].append(random.choice(list(tile_set.values())))
                 # delete it from set
-                del tile_set[n]
+                ##del tile_set[n]
         hands['Table'] = tile_set
         table_tile_cnt = len(hands['Table'])
         print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players. Got {table_tile_cnt} tiles left on table and {[round, round]} is strating tile.\n')
@@ -281,20 +285,6 @@ class game:
                 print(f'{i} place. Player {k} scores {final_scores[k]}.')
             i += 1
 
-
-#gm = game(pl)
-#gm.end_game()
-
-#ts = tile_set()
-tbl = table(in_players_count)
-print(repr(tbl.tile_set))
-#tbl.deal(12)
-#r = game_round(tbl, in_max_tile)
-#for p in range(1, in_players_count+1):
-#    trl = r.init_trail(p, in_difficulty)
-#r.move(1)
-#r.move(2)
-#r.move(3)
-#r.move(4)
-#print(tbl.table)
-#r.calc_hands()
+a = tile((1,2))
+print(a)
+a.flip()
