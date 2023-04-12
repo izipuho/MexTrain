@@ -41,7 +41,7 @@ class tile:
 
 class tile_set:
     def __init__(self):
-        self.max_tile = [in_max_tile, in_max_tile]
+        self.max_tile = in_max_tile#[in_max_tile, in_max_tile]
         self.set = []
         self.create()
         print(self)
@@ -55,20 +55,20 @@ class tile_set:
         random.shuffle(self.set)
 
     def __str__(self):
-        return(f'Got {len(self.set)} tiles in set with {in_max_tile} highest.')
+        return(f'Got set of {len(self.set)} tiles with {self.max_tile} highest.')
 
 #TODO messed up with tile set
 class table:
     def __init__(self, players):
         self.players = players 
-        self.ts = tile_set()
-        self.table_tile_cnt = len(self.ts.ts)
-        # set hand tile_count
-        self.hand_tile_cnt = in_max_tile#12
+        self.tile_set = tile_set()
+        self.max_tile = self.tile_set.max_tile
+        #self.table_tile_cnt = len(self.tile_set.set)
+        # Set hand tile_count. Not by the rules, but why not to make it?
+        self.hand_tile_cnt = self.tile_set.max_tile#in_max_tile#12
         if self.players == 2:
             self.hand_tile_cnt += 3
-        print(self.ts)
-        # init scores
+        # Init scores
         self.scores = dict()
         for p in range(1, self.players+1):
             self.scores[p] = 0
@@ -76,10 +76,9 @@ class table:
         self.table = dict()
 
     def deal(self, round):
-        ts = self.ts.ts.copy()
+        tile_set = self.tile_set.set.copy()
         # remove start tile
-        #print(ts)
-        ts.remove([round, round])
+        tile_set.remove(tile([round, round]))
         # init hands
         hands = dict()
         trails = dict() 
@@ -91,18 +90,19 @@ class table:
         for t in range(0, self.hand_tile_cnt):
             for p in range(1, self.players+1):
                 # get random tile
-                n = random.randint(0, len(ts)-1)
+                n = random.randint(0, len(tile_set)-1)
                 #print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
-                hands[p].append(ts[n])
+                hands[p].append(tile_set[n])
                 # delete it from set
-                del ts[n]
-        hands['Table'] = ts
+                del tile_set[n]
+        hands['Table'] = tile_set
         table_tile_cnt = len(hands['Table'])
         print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players. Got {table_tile_cnt} tiles left on table and {[round, round]} is strating tile.\n')
         self.table = {'hands': hands, 'trails': trails, 'moves': 0}
 
     def __str__(self):
-        return(f'Got set of {self.table_tile_cnt} tiles.')
+        #return(f'Got set of {self.table_tile_cnt} tiles.')
+        pass
 
 
 class game_round:
@@ -257,7 +257,7 @@ class game:
         self.players = players
         self.tbl = table(self.players)
         self.first_player = randint(1, 4)
-        for rnd in range(in_max_tile, -1, -1):
+        for rnd in range(self.tbl.max_tile, -1, -1):
             #print(self.tbl)
             r = game_round(self.tbl, rnd)
             for p in range(1, self.players+1):
@@ -276,8 +276,9 @@ class game:
 #gm = game(pl)
 #gm.end_game()
 
+#ts = tile_set()
 tbl = table(in_players_count)
-#tbl.deal(12)
+tbl.deal(12)
 #r = game_round(tbl, in_max_tile)
 #for p in range(1, in_players_count+1):
 #    trl = r.init_trail(p, in_difficulty)
