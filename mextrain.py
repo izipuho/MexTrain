@@ -40,35 +40,35 @@ class tile:
         return(f'Tile {self.numbers} scores {self.score} points.')
 
 class tile_set:
+    #tl = tile(in_max_tile)
     def __init__(self):
-        self.max_tile = in_max_tile#[in_max_tile, in_max_tile]
-        self.set = []
-        self.create()
-        print(self)
+        self.in_max_tile = [self.tl.max_tile, self.tl.max_tile]
+        #self.tile_set = self.create()
+        self.ts = self.create()
 
     def create(self):
-        for t in range(in_max_tile, -1, -1):
+        tile_set = []
+        for t in range(self.tl.max_tile, -1, -1):
             for i in range(t, -1, -1):
-                tl = tile([t,i])
-                #print(tl)
-                self.set.append(tl)
-        random.shuffle(self.set)
+               tile = [t, i]
+               tile_set.append(tile)
+        random.shuffle(tile_set)
+        return(tile_set)
 
     def __str__(self):
-        return(f'Got set of {len(self.set)} tiles with {self.max_tile} highest.')
+        return(f'Got {len(self.ts)} tiles in set with {self.in_max_tile} highest.')
 
-#TODO messed up with tile set
 class table:
     def __init__(self, players):
         self.players = players 
-        self.tile_set = tile_set()
-        self.max_tile = self.tile_set.max_tile
-        #self.table_tile_cnt = len(self.tile_set.set)
-        # Set hand tile_count. Not by the rules, but why not to make it?
-        self.hand_tile_cnt = self.tile_set.max_tile#in_max_tile#12
+        self.ts = tile_set()
+        self.table_tile_cnt = len(self.ts.ts)
+        # set hand tile_count
+        self.hand_tile_cnt = in_max_tile#12
         if self.players == 2:
             self.hand_tile_cnt += 3
-        # Init scores
+        print(self.ts)
+        # init scores
         self.scores = dict()
         for p in range(1, self.players+1):
             self.scores[p] = 0
@@ -76,9 +76,10 @@ class table:
         self.table = dict()
 
     def deal(self, round):
-        tile_set = self.tile_set.set.copy()
+        ts = self.ts.ts.copy()
         # remove start tile
-        tile_set.remove(tile([round, round]))
+        #print(ts)
+        ts.remove([round, round])
         # init hands
         hands = dict()
         trails = dict() 
@@ -90,19 +91,18 @@ class table:
         for t in range(0, self.hand_tile_cnt):
             for p in range(1, self.players+1):
                 # get random tile
-                n = random.randint(0, len(tile_set)-1)
+                n = random.randint(0, len(ts)-1)
                 #print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
-                hands[p].append(tile_set[n])
+                hands[p].append(ts[n])
                 # delete it from set
-                del tile_set[n]
-        hands['Table'] = tile_set
+                del ts[n]
+        hands['Table'] = ts
         table_tile_cnt = len(hands['Table'])
         print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players. Got {table_tile_cnt} tiles left on table and {[round, round]} is strating tile.\n')
         self.table = {'hands': hands, 'trails': trails, 'moves': 0}
 
     def __str__(self):
-        #return(f'Got set of {self.table_tile_cnt} tiles.')
-        pass
+        return(f'Got set of {self.table_tile_cnt} tiles.')
 
 
 class game_round:
@@ -257,7 +257,7 @@ class game:
         self.players = players
         self.tbl = table(self.players)
         self.first_player = randint(1, 4)
-        for rnd in range(self.tbl.max_tile, -1, -1):
+        for rnd in range(in_max_tile, -1, -1):
             #print(self.tbl)
             r = game_round(self.tbl, rnd)
             for p in range(1, self.players+1):
@@ -276,9 +276,8 @@ class game:
 #gm = game(pl)
 #gm.end_game()
 
-#ts = tile_set()
-tbl = table(in_players_count)
-tbl.deal(12)
+#tbl = table(in_players_count)
+#tbl.deal(12)
 #r = game_round(tbl, in_max_tile)
 #for p in range(1, in_players_count+1):
 #    trl = r.init_trail(p, in_difficulty)
@@ -288,3 +287,16 @@ tbl.deal(12)
 #r.move(4)
 #print(tbl.table)
 #r.calc_hands()
+
+a = tile([0,1])
+b = tile([0,0])
+c = tile([2,1])
+d = tile([2,10])
+e = tile([3,4])
+
+a.is_double()
+b.is_double()
+c.flip()
+print(c)
+print(e.is_suitable(4), e)
+print(b)
