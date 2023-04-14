@@ -1,12 +1,13 @@
 #!/usr/bin/env python3.9
 import random
+import pprint
 
 # in_max_tile = int(input('What is the maximum tile: '))
 # in_players_count = int(input('How much players are we awaiting: '))
 # in_difficulty = input('What is the difficulty: ')
 in_max_tile = 12
 in_players_count = 4
-in_difficulty = 'normal'
+in_difficulty = 'easy'
 
 
 # define tile
@@ -94,6 +95,7 @@ class table:
         print('Dealing...')
         tile_set = self.tile_set.set.copy()
         # Remove start tile. Ugly: not by tile class. MayBe TODO
+        #TODO fix to normal tile-class
         del tile_set[f'{round}-{round}']
         # Init hands
         hands = dict()
@@ -101,7 +103,6 @@ class table:
         for p in range(1, self.players + 1):
             hands[p] = dict()
             trails[p] = ['Closed', dict()]
-        #TODO fix to normal tile-class
         trails['Table'] = ['Opened', [[round, round]]]
         # deal
         for t in range(0, self.hand_tile_cnt):
@@ -152,7 +153,7 @@ class game_round:
     def init_trail(self, player, difficulty):
         # get one hand
         hand = self.hands[player]
-        trail = []
+        trail = dict()
         init_number = self.num
         print(f'\tPlayer {player} had hand: {hand}')
         if difficulty in ('easy', 'e', '0'):
@@ -160,15 +161,17 @@ class game_round:
             while len(hand) != 0 and init_number != -1:
                 # print(f'Looking for {init_number}')
                 # print(f'Hand tile count: {len(hand)}')
-                for t in hand:
-                    # print(f'{hand.index(t) + 1}. Current tile: {t}')
+                i = 0
+                for k, t in hand.items():
+                    # print(f'--Key is {k} and value {repr(t)}')
+                    i += 1
                     if t.is_suitable(init_number):
                         # print(f'{t} is ok')
-                        hand.remove(t)
-                        trail.append(t)
+                        del hand[k]
+                        trail[k] = t
                         init_number = t.numbers[1]
                         break
-                    if hand.index(t) + 1 == len(hand):
+                    if i + 1 == len(hand):
                         # print('None found')
                         init_number = -1
                         break
@@ -260,22 +263,23 @@ class game_round:
 
     def calc_hands(self):
         for p in self.hands:
-            print(f'{p}: {self.hands[p]}')
+            # print(f'--{p}: {self.hands[p]}')
             final_score = 0
             #TODO some t is not tile class but str. Fix
-            for t in self.hands[p]:
-                print(f'--{t.numbers}')
-                print(f'--{t} {t.score} points gonna be added.')
+            for t in self.hands[p].values():
+                # print(f'--{t.numbers}')
+                # print(f'--{t} {t.score} points gonna be added.')
                 final_score += t.score
             self.table.scores[p] += final_score
             if p == 'Table':
-                print(f'\t{len(self.hands[p])} tiles undealed for {score} points.')
+                print(f'\t{len(self.hands[p])} tiles undealed for {final_score} points.\n')
             else:
                 if final_score == 0:
                     print(f'\tPlayer {p} has no tiles left in hand and scores {final_score}.')
                 else:
                     print(f'\tPlayer {p} has {len(self.hands[p])} tiles left in hand and scores {final_score}.')
-                    print(f'\tHis tiles: {self.hands[p]}')
+                    #TODO ugly printing with dict_values
+                    print(f'\tHis tiles: {self.hands[p].values()}\n')
 
 
 class game:
@@ -298,16 +302,5 @@ class game:
                 print(f'{i} place. Player {k} scores {final_scores[k]}.')
             i += 1
 
-tbl = table(in_players_count)
-print(tbl)
-gr = game_round(tbl, 12)
-print(tbl.layout)
-gr.init_trail(1, 'easy')
-gr.init_trail(2, 'easy')
-gr.init_trail(3, 'easy')
-gr.init_trail(4, 'easy')
-print(tbl)
-print(repr(tbl))
-print(tbl.layout['hands'][1])
-print(tbl.layout['hands']['Table'])
-#gr.calc_hands()
+gm = game(4)
+gm.end_game()
