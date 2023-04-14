@@ -99,8 +99,9 @@ class table:
         hands = dict()
         trails = dict()
         for p in range(1, self.players + 1):
-            hands[p] = []
+            hands[p] = dict()
             trails[p] = ['Closed', dict()]
+        #TODO fix to normal tile-class
         trails['Table'] = ['Opened', [[round, round]]]
         # deal
         for t in range(0, self.hand_tile_cnt):
@@ -109,8 +110,9 @@ class table:
                 ##n = random.randint(0, len(tile_set)-1)
                 # print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
                 ##hands[p].append(tile_set[n])
-                tl = random.choice(list(tile_set.values()))
-                hands[p].append(tl)
+                k, tl = random.choice(list(tile_set.items()))
+                #print(f'--Player {p} draws tile with key {k} and value {repr(tl)}')
+                hands[p][k] = tl
                 # delete it from set
                 del tile_set[tl.code]
         hands['Table'] = tile_set
@@ -258,20 +260,21 @@ class game_round:
 
     def calc_hands(self):
         for p in self.hands:
-            score = 0
+            print(f'{p}: {self.hands[p]}')
+            final_score = 0
             #TODO some t is not tile class but str. Fix
             for t in self.hands[p]:
-                print(t.numbers)
-                print(f'{t} {t.score} point gonna be added.')
-                score += t.score
-            self.table.scores[p] += score
+                print(f'--{t.numbers}')
+                print(f'--{t} {t.score} points gonna be added.')
+                final_score += t.score
+            self.table.scores[p] += final_score
             if p == 'Table':
                 print(f'\t{len(self.hands[p])} tiles undealed for {score} points.')
             else:
-                if score == 0:
-                    print(f'\tPlayer {p} has no tiles left in hand and scores {score}.')
+                if final_score == 0:
+                    print(f'\tPlayer {p} has no tiles left in hand and scores {final_score}.')
                 else:
-                    print(f'\tPlayer {p} has {len(self.hands[p])} tiles left in hand and scores {score}.')
+                    print(f'\tPlayer {p} has {len(self.hands[p])} tiles left in hand and scores {final_score}.')
                     print(f'\tHis tiles: {self.hands[p]}')
 
 
@@ -298,7 +301,13 @@ class game:
 tbl = table(in_players_count)
 print(tbl)
 gr = game_round(tbl, 12)
+print(tbl.layout)
 gr.init_trail(1, 'easy')
-#print(tbl)
+gr.init_trail(2, 'easy')
+gr.init_trail(3, 'easy')
+gr.init_trail(4, 'easy')
+print(tbl)
 print(repr(tbl))
-gr.calc_hands()
+print(tbl.layout['hands'][1])
+print(tbl.layout['hands']['Table'])
+#gr.calc_hands()
