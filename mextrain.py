@@ -259,7 +259,7 @@ class game_round:
     def calc_hands(self):
         for p in self.hands:
             score = 0
-            #TODO some t is not tile class but str. Fix.
+            #TODO some t is not tile class but str. Fix
             for t in self.hands[p]:
                 print(t.numbers)
                 print(f'{t} {t.score} point gonna be added.')
