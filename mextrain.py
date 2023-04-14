@@ -127,15 +127,17 @@ class table:
         return table_str
 
     def __repr__(self):
+        #print(f"What do we have on table?\n{self.layout['round']}")
         layout_repr = str()
-        if self.layout['round'][1] == 'Dealt':
+        if self.layout['round'][1] != 'Dealt':
+            #print('Table is set. We have trails.')
             layout_repr = 'Trails are:\n'
             for p in range(1, self.players + 1):
-                layout_repr += f"Player {p} has trail:\n"
-                layout_repr += f"\t{self.layout['trails'][p]}"
-            return layout_repr
+                layout_repr += f"\tPlayer {p} has trail:\n"
+                layout_repr += f"\t\t{self.layout['trails'][p][1]} and it is {self.layout['trails'][p][0].lower()}.\n"
         else:
             pass
+        return layout_repr
 
 class game_round:
     def __init__(self, table, round_num):
@@ -193,6 +195,7 @@ class game_round:
                             print('Old one is good')
                             pass
                 init_number = second_number
+                #TODO I don't like the good_tile
                 if second_number != -1:
                     hand.remove(good_tile)
                     trail.append(good_tile)
@@ -254,22 +257,22 @@ class game_round:
         print('\n')
 
     def calc_hands(self):
-        for k in self.hands:
+        for p in self.hands:
             score = 0
-            for t in self.hands[k]:
-                # print([t][0])
-                score += [t][0][0] + [t][0][1]
-                if t == [0, 0]:
-                    score += 25
-            self.table.scores[k] += score
-            if k == 'Table':
-                print(f'\t{len(self.hands[k])} tiles undealed for {score} points.')
+            #TODO some t is not tile class but str. Fix.
+            for t in self.hands[p]:
+                print(t.numbers)
+                print(f'{t} {t.score} point gonna be added.')
+                score += t.score
+            self.table.scores[p] += score
+            if p == 'Table':
+                print(f'\t{len(self.hands[p])} tiles undealed for {score} points.')
             else:
                 if score == 0:
-                    print(f'\tPlayer {k} has no tiles left in hand and scores {score}.')
+                    print(f'\tPlayer {p} has no tiles left in hand and scores {score}.')
                 else:
-                    print(f'\tPlayer {k} has {len(self.hands[k])} tiles left in hand and scores {score}.')
-                    print(f'\tHis tiles: {self.hands[k]}')
+                    print(f'\tPlayer {p} has {len(self.hands[p])} tiles left in hand and scores {score}.')
+                    print(f'\tHis tiles: {self.hands[p]}')
 
 
 class game:
@@ -295,5 +298,7 @@ class game:
 tbl = table(in_players_count)
 print(tbl)
 gr = game_round(tbl, 12)
-gr.init_trail(1, 'normal')
-print(tbl)
+gr.init_trail(1, 'easy')
+#print(tbl)
+print(repr(tbl))
+gr.calc_hands()
