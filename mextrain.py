@@ -51,6 +51,7 @@ class tile:
 
 
 class tile_set:
+    #tl = tile(in_max_tile)
     def __init__(self):
         self.max_tile = in_max_tile  # [in_max_tile, in_max_tile]
         self.set = dict()
@@ -59,7 +60,8 @@ class tile_set:
         print(self)
 
     def create(self):
-        for t in range(in_max_tile, -1, -1):
+        tile_set = []
+        for t in range(self.tl.max_tile, -1, -1):
             for i in range(t, -1, -1):
                 tl = tile([t, i])
                 # print(tl)
@@ -82,9 +84,11 @@ class table:
         # self.table_tile_cnt = len(self.tile_set.set)
         # Set hand tile_count. Not by the rules, but why not to make it?
         self.hand_tile_cnt = self.tile_set.max_tile  # in_max_tile#12
+
         if self.players == 2:
             self.hand_tile_cnt += 3
-        # Init scores
+        print(self.ts)
+        # init scores
         self.scores = dict()
         for p in range(1, self.players + 1):
             self.scores[p] = 0
@@ -301,6 +305,7 @@ class game:
             if k != 'Table':
                 print(f'{i} place. Player {k} scores {final_scores[k]}.')
             i += 1
+
 
 gm = game(4)
 gm.end_game()
