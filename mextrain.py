@@ -4,19 +4,19 @@ import random
 # in_max_tile = int(input('What is the maximum tile: '))
 # in_players_count = int(input('How much players are we awaiting: '))
 # in_difficulty = input('What is the difficulty: ')
-in_max_tile = 12
-in_players_count = 4
+in_max_tile = 6
+in_players_count = 3
 in_difficulty = 'easy'
 
 
 # TODO ugly printing with dict_values
-# define tile
 class Tile:
     def __init__(self, numbers):
         self.numbers = numbers
         self.code = f'{numbers[0]}-{numbers[1]}'
         self.text = f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
         self.text_flipped = f'[{self.numbers[1]:>2}|{self.numbers[0]:>2}]'
+        self.highlighted = False
         self.score = sum(numbers)
         if self.score == 0:
             self.score = 25
@@ -43,8 +43,16 @@ class Tile:
             # print(f'{self.numbers} vs {number}: No!')
             return False
 
+    def highlight(self):
+        self.highlighted = True
+    def dehighlight(self):
+        self.highlighted = False
+
     def __repr__(self):
-        return f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
+        tile_repr = f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
+        if self.highlighted:
+            tile_repr.replace('[', '{').replace(']', '}')
+        return tile_repr
 
     def __str__(self):
         return f'Tile {self.numbers} scores {self.score} points.'
@@ -227,13 +235,13 @@ class GameRound:
         print('\n')
 
     def move(self, player):
-        print(f"Move {self.table.table['moves']}. Player {player}.")
-        hand = self.table.table['hands'][player]
+        print(f"Move {self.table.layout['moves']}. Player {player}.")
+        hand = self.table.layout['hands'][player]
         print(f'Current hand: {hand}')
         possible_moves = {'tiles': dict(), 'nums': dict(), 'arr': [], 'possible_tiles': dict(), 'possible_cnt': 0}
-        if self.table.table['moves'] != 0 and self.table.table['trails'][player][0] != 'Empty':
-            self.table.table['trails'][player][0] = 'Opened'
-        for p, t in self.table.table['trails'].items():
+        if self.table.layout['moves'] != 0 and self.table.layout['trails'][player][0] != 'Empty':
+            self.table.layout['trails'][player][0] = 'Opened'
+        for p, t in self.table.layout['trails'].items():
             print(p, t)
             if t[0] == 'Opened':
                 possible_moves['tiles'][p] = t[1][-1]
@@ -255,9 +263,9 @@ class GameRound:
         if possible_moves['possible_cnt'] == 0:
             new_tile = self.table.draw(player)
             # TODO
-        if self.table.table['trails'][player][0] != 'Empty':
-            self.table.table['trails'][player][0] = 'Closed'
-        self.table.table['moves'] += 1
+        if self.table.layout['trails'][player][0] != 'Empty':
+            self.table.layout['trails'][player][0] = 'Closed'
+        self.table.layout['moves'] += 1
         print('\n')
 
     def calc_hands(self):
@@ -300,7 +308,3 @@ class Game:
             if k != 'Table':
                 print(f'{i} place. Player {k} scores {final_scores[k]}.')
             i += 1
-
-
-gm = Game(4, 2)
-gm.end()
