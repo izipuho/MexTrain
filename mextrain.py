@@ -295,7 +295,7 @@ class Game:
         self.first_player = random.randint(1, 4)
         if rounds:
             print(f'Game will last for {rounds} rounds. Final round is {self.tbl.max_tile - rounds}.\n')
-        for rnd in range(self.tbl.max_tile, self.tbl.max_tile - rounds or 0 -1, -1):
+        for rnd in range(self.tbl.max_tile, self.tbl.max_tile or 0 - rounds -1, -1):
             r = GameRound(self.tbl, rnd)
             for p in range(1, self.players + 1):
                 r.init_trail(p, in_difficulty)
