@@ -1,6 +1,5 @@
 #!/usr/bin/env python3.9
 import random
-import pprint
 
 # in_max_tile = int(input('What is the maximum tile: '))
 # in_players_count = int(input('How much players are we awaiting: '))
@@ -11,7 +10,7 @@ in_difficulty = 'easy'
 
 
 # define tile
-class tile:
+class Tile:
     def __init__(self, numbers):
         self.numbers = numbers
         self.code = f'{numbers[0]}-{numbers[1]}'
@@ -30,7 +29,7 @@ class tile:
             return False
 
     def flip(self):
-        # print(f'Tile {self.text} will be fliped to {self.text_flipped}')
+        # print(f'Tile {self.text} will be flipped to {self.text_flipped}')
         self.numbers.reverse()
 
     def is_suitable(self, number):
@@ -50,8 +49,8 @@ class tile:
         return f'Tile {self.numbers} scores {self.score} points.'
 
 
-class tile_set:
-    #tl = tile(in_max_tile)
+class TileSet:
+    # tl = tile(in_max_tile)
     def __init__(self):
         self.max_tile = in_max_tile  # [in_max_tile, in_max_tile]
         self.set = dict()
@@ -60,10 +59,9 @@ class tile_set:
         print(self)
 
     def create(self):
-        tile_set = []
         for t in range(self.max_tile, -1, -1):
             for i in range(t, -1, -1):
-                tl = tile([t, i])
+                tl = Tile([t, i])
                 # print(tl)
                 self.set[tl.code] = tl
                 self.set_repr += str(tl) + ' '
@@ -76,10 +74,10 @@ class tile_set:
         return self.set_repr
 
 
-class table:
+class Table:
     def __init__(self, players):
         self.players = players
-        self.tile_set = tile_set()
+        self.tile_set = TileSet()
         self.max_tile = self.tile_set.max_tile
         # self.table_tile_cnt = len(self.tile_set.set)
         # Set hand tile_count. Not by the rules, but why not to make it?
@@ -95,35 +93,44 @@ class table:
         self.scores['Table'] = 0
         self.layout = dict()
 
-    def deal(self, round):
+    def draw(self, player):
+        # get random tile
+        n = random.randint(0, len(self.table.table['hands']['Table']) - 1)
+        # print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
+        self.table.table['hands'][player].append(self.table.table['hands']['Table'][n])
+        print(f"Draw a tile from table: {self.table.table['hands']['Table'][n]}")
+        return self.table.table['hands']['Table'][n]
+        # delete it from set
+        del self.table.table['hands']['Table'][n]
+
+    def deal(self, round_num):
         print('Dealing...')
         tile_set = self.tile_set.set.copy()
         # Remove start tile. Ugly: not by tile class. MayBe TODO
-        #TODO fix to normal tile-class
-        del tile_set[f'{round}-{round}']
+        # TODO fix to normal tile-class
+        del tile_set[f'{round_num}-{round_num}']
         # Init hands
         hands = dict()
         trails = dict()
         for p in range(1, self.players + 1):
             hands[p] = dict()
             trails[p] = ['Closed', dict()]
-        trails['Table'] = ['Opened', [[round, round]]]
+        trails['Table'] = ['Opened', [[round_num, round_num]]]
         # deal
         for t in range(0, self.hand_tile_cnt):
             for p in range(1, self.players + 1):
                 # get random tile
-                ##n = random.randint(0, len(tile_set)-1)
                 # print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
-                ##hands[p].append(tile_set[n])
                 k, tl = random.choice(list(tile_set.items()))
-                #print(f'--Player {p} draws tile with key {k} and value {repr(tl)}')
+                # print(f'--Player {p} draws tile with key {k} and value {repr(tl)}')
                 hands[p][k] = tl
                 # delete it from set
                 del tile_set[tl.code]
         hands['Table'] = tile_set
-        table_tile_cnt = len(hands['Table'])
-        #print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players. Got {table_tile_cnt} tiles left on table and {[round, round]} is strating tile.\n')
-        self.layout = {'hands': hands, 'trails': trails, 'moves': 0, 'round': [round, 'Dealt']}
+        # table_tile_cnt = len(hands['Table'])
+        # print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players.')
+        # print(f'Got {table_tile_cnt} tiles left on table and {[round, round]} is starting tile.\n')
+        self.layout = {'hands': hands, 'trails': trails, 'moves': 0, 'round': [round_num, 'Dealt']}
 
     def __str__(self):
         table_str = f'We have {self.players} players at the table'
@@ -134,10 +141,10 @@ class table:
         return table_str
 
     def __repr__(self):
-        #print(f"What do we have on table?\n{self.layout['round']}")
+        # print(f"What do we have on table?\n{self.layout['round']}")
         layout_repr = str()
         if self.layout['round'][1] != 'Dealt':
-            #print('Table is set. We have trails.')
+            # print('Table is set. We have trails.')
             layout_repr = 'Trails are:\n'
             for p in range(1, self.players + 1):
                 layout_repr += f"\tPlayer {p} has trail:\n"
@@ -146,7 +153,8 @@ class table:
             pass
         return layout_repr
 
-class game_round:
+
+class GameRound:
     def __init__(self, table, round_num):
         self.num = round_num
         self.table = table
@@ -191,7 +199,7 @@ class game_round:
                     print(f'{hand.index(t) + 1}. Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
                     if t.is_suitable(init_number):
                         print(f'{t} is ok')
-                        #TODO something bad with this breaking loop
+                        # TODO something bad with this breaking loop
                         if t.is_double:
                             print('Double is always good. Take it.')
                             good_tile = t
@@ -204,7 +212,7 @@ class game_round:
                             print('Old one is good')
                             pass
                 init_number = second_number
-                #TODO I don't like the good_tile
+                # TODO I don't like the good_tile
                 if second_number != -1:
                     hand.remove(good_tile)
                     trail.append(good_tile)
@@ -217,19 +225,10 @@ class game_round:
             self.table.layout['trails'][player][0] = 'Empty'
             print(f'\t\tPlayer {player} has no trail')
         else:
-            print(f'\t\tPlayer {player} has init trail {len(trail)} tiles long: {trail}')
+            print(f'\t\tPlayer {player} has init trail {len(trail)} tiles long: {trail.values()}')
         self.table.layout['round'][1] = 'Init trails'
         print('\n')
 
-    def draw(self, player):
-        # get random tile
-        n = random.randint(0, len(self.table.table['hands']['Table']) - 1)
-        # print("deal: {order}'th tile out of {total}".format(order = n, total = len(tile_set)))
-        self.table.table['hands'][player].append(self.table.table['hands']['Table'][n])
-        print(f"Draw a tile from table: {self.table.table['hands']['Table'][n]}")
-        return self.table.table['hands']['Table'][n]
-        # delete it from set
-        del self.table.table['hands']['Table'][n]
 
     def move(self, player):
         print(f"Move {self.table.table['moves']}. Player {player}.")
@@ -269,36 +268,36 @@ class game_round:
         for p in self.hands:
             # print(f'--{p}: {self.hands[p]}')
             final_score = 0
-            #TODO some t is not tile class but str. Fix
+            # TODO some t is not tile class but str. Fix
             for t in self.hands[p].values():
                 # print(f'--{t.numbers}')
                 # print(f'--{t} {t.score} points gonna be added.')
                 final_score += t.score
             self.table.scores[p] += final_score
             if p == 'Table':
-                print(f'\t{len(self.hands[p])} tiles undealed for {final_score} points.\n')
+                print(f'\t{len(self.hands[p])} tiles undealt for {final_score} points.\n')
             else:
                 if final_score == 0:
                     print(f'\tPlayer {p} has no tiles left in hand and scores {final_score}.')
                 else:
                     print(f'\tPlayer {p} has {len(self.hands[p])} tiles left in hand and scores {final_score}.')
-                    #TODO ugly printing with dict_values
+                    # TODO ugly printing with dict_values
                     print(f'\tHis tiles: {self.hands[p].values()}\n')
 
 
-class game:
+class Game:
     def __init__(self, players):
         self.players = players
-        self.tbl = table(self.players)
+        self.tbl = Table(self.players)
         self.first_player = random.randint(1, 4)
         for rnd in range(self.tbl.max_tile, -1, -1):
             # print(self.tbl)
-            r = game_round(self.tbl, rnd)
+            r = GameRound(self.tbl, rnd)
             for p in range(1, self.players + 1):
                 r.init_trail(p, in_difficulty)
             r.calc_hands()
 
-    def end_game(self):
+    def end(self):
         final_scores = dict(sorted(self.tbl.scores.items(), key=lambda item: item[1]))
         i = 1
         for k in final_scores:
@@ -307,5 +306,5 @@ class game:
             i += 1
 
 
-gm = game(4)
-gm.end_game()
+gm = Game(4)
+gm.end()
