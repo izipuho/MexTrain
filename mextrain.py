@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3
 import random
 
 # in_max_tile = int(input('What is the maximum tile: '))
@@ -9,6 +9,7 @@ in_players_count = 4
 in_difficulty = 'easy'
 
 
+# TODO ugly printing with dict_values
 # define tile
 class Tile:
     def __init__(self, numbers):
@@ -184,7 +185,6 @@ class GameRound:
                         # print('None found')
                         init_number = -1
                         break
-        # TODO messed up with tile_set and tile classes
         elif difficulty in ('normal', 'n', '1'):
             # max based without doubles
             i = 0
@@ -265,7 +265,6 @@ class GameRound:
         for p in hands:
             # print(f'--{p}: {self.hands[p]}')
             final_score = 0
-            # TODO some t is not tile class but str. Fix
             for t in hands[p].values():
                 # print(f'--{t.numbers}')
                 # print(f'--{t} {t.score} points gonna be added.')
@@ -278,7 +277,6 @@ class GameRound:
                     print(f'\tPlayer {p} has no tiles left in hand and scores {final_score}.')
                 else:
                     print(f'\tPlayer {p} has {len(hands[p])} tiles left in hand and scores {final_score}.')
-                    # TODO ugly printing with dict_values
                     print(f'\tHis tiles: {hands[p].values()}\n')
 
 
