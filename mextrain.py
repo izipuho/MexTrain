@@ -61,7 +61,7 @@ class tile_set:
 
     def create(self):
         tile_set = []
-        for t in range(self.tl.max_tile, -1, -1):
+        for t in range(self.max_tile, -1, -1):
             for i in range(t, -1, -1):
                 tl = tile([t, i])
                 # print(tl)
@@ -87,7 +87,7 @@ class table:
 
         if self.players == 2:
             self.hand_tile_cnt += 3
-        print(self.ts)
+        print(self.tile_set)
         # init scores
         self.scores = dict()
         for p in range(1, self.players + 1):
