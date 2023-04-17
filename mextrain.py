@@ -105,6 +105,7 @@ class Table:
                         'hands': dict(),
                         'trails': dict(),
                         'moves': 0,
+                        'round': [-1, 'Init']
         }
 
     def draw(self, player):
@@ -124,7 +125,7 @@ class Table:
         for p in range(1, self.players + 1):
             hands[p] = dict()
             trails[p] = ['Closed', dict()]
-        trails['Table'] = ['Opened', {init_tile}]
+        trails['Table'] = ['Opened', {init_tile.code: init_tile}]
         # deal
         for t in range(0, self.hand_tile_cnt):
             for p in range(1, self.players + 1):
@@ -133,7 +134,7 @@ class Table:
         # print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players.')
         # print(f'Got {table_tile_cnt} tiles left on table and {[round, round]} is starting tile.\n')
         # self.layout = {'hands': hands, 'trails': trails, 'moves': 0, 'round': [round_num, 'Dealt']}
-        self.layout['round'][1] = 'Dealt'
+        self.layout['round'] = [round_num, 'Dealt']
 
     def __str__(self):
         table_str = f'We have {self.players} players at the table'
