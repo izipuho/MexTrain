@@ -45,14 +45,15 @@ class Tile:
 
     def highlight(self):
         self.highlighted = True
+        self.text.replace('[', '{').replace(']', '}')
+        self.text_flipped.replace('[', '{').replace(']', '}')
     def dehighlight(self):
         self.highlighted = False
+        self.text.replace('{', '[').replace('}', ']')
+        self.text_flipped.replace('{', '[').replace('}', ']')
 
     def __repr__(self):
-        tile_repr = f'[{self.numbers[0]:>2}|{self.numbers[1]:>2}]'
-        if self.highlighted:
-            tile_repr.replace('[', '{').replace(']', '}')
-        return tile_repr
+        return self.text
 
     def __str__(self):
         return f'Tile {self.numbers} scores {self.score} points.'
@@ -108,12 +109,39 @@ class Table:
                         'round': [-1, 'Init']
         }
 
+    def move_tile(self, tile, src = [], dst = []):
+    # TODO make some restrictions
+        # inputs must be:
+        # src: ['hand'/'Table', player or None]
+        # dst: ['hand'/'trail'/'Table', player]
+        if src[0] == 'Table':
+            if dst[0] == 'trail':
+                raise Exception("You can't move tile from table straight to trail.")
+            elif dst[0] == 'hand':
+                self.layout['hands']['Table'].pop(tile.code)
+                if dst[1]:
+                    self.layout['hands'][dst[1]].update({tile.code: tile})
+                else:
+                    raise Exception('Determine player')
+        elif src[0] == 'hand':
+            if src[1]:
+                self.layout['hands'][src[1]].pop(tile.code)
+            else:
+                raise Exception('Determine source player')
+            #if dst[0] == 'trail':
+            if dst[0] in ('trail', 'Table'):
+                if dst[1]:
+                    self.layout['trails'][dst[1]][1].update({tile.code: tile})
+                else:
+                    self.layout['trails']['Table'][1].update({tile.code: tile})
+
+
     def draw(self, player):
         k, tl = random.choice(list(self.layout['hands']['Table'].items()))
         # print(f'--Player {p} draws tile with key {k} and value {repr(tl)}')
-        self.layout['hands'][player][k] = tl
-        # delete it from set
-        del self.layout['hands']['Table'][tl.code]
+        self.move_tile(tl, ['Table'], ['hand', player])
+        #self.layout['hands'][player][k] = tl
+        #del self.layout['hands']['Table'][tl.code]
 
     def deal(self, round_num):
         self.layout['hands']['Table'] = self.tile_set.set.copy()
@@ -124,7 +152,7 @@ class Table:
         del hands['Table'][init_tile.code]
         for p in range(1, self.players + 1):
             hands[p] = dict()
-            trails[p] = ['Closed', dict()]
+            trails[p] = ['Empty', dict()]
         trails['Table'] = ['Opened', {init_tile.code: init_tile}]
         # deal
         for t in range(0, self.hand_tile_cnt):
@@ -175,7 +203,7 @@ class GameRound:
         trail = dict()
         init_number = self.num
         print(f'\tPlayer {player} had hand: {hand.values()}')
-        if difficulty in ('easy', 'e', '0'):
+        if difficulty in ('easy', 'e', '0', 0):
             # order based
             while len(hand) != 0 and init_number != -1:
                 # print(f'Looking for {init_number}')
@@ -190,11 +218,11 @@ class GameRound:
                         trail[k] = t
                         init_number = t.numbers[1]
                         break
-                    if i + 1 == len(hand):
+                    if i == len(hand):
                         # print('None found')
                         init_number = -1
                         break
-        elif difficulty in ('normal', 'n', '1'):
+        elif difficulty in ('normal', 'n', '1', 1):
             # max based without doubles
             i = 0
             while len(hand) != 0 and init_number != -1 and i < 100:
@@ -228,14 +256,14 @@ class GameRound:
                 i += 1
         self.table.layout['trails'][player][1] = trail
         if len(trail) == 0:
-            self.table.layout['trails'][player][0] = 'Empty'
             print(f'\t\tPlayer {player} has no trail')
         else:
+            self.table.layout['trails'][player][0] = 'Closed'
             print(f'\t\tPlayer {player} has init trail {len(trail)} tiles long: {trail.values()}')
         self.table.layout['round'][1] = 'Init trails'
         print('\n')
 
-    def move(self, player):
+    def turn(self, player):
         print(f"Move {self.table.layout['moves']}. Player {player}.")
         hand = self.table.layout['hands'][player]
         print(f'Current hand: {hand}')
@@ -269,7 +297,7 @@ class GameRound:
         self.table.layout['moves'] += 1
         print('\n')
 
-    def calc_hands(self):
+    def aftermath(self):
         hands = self.table.layout['hands']
         for p in hands:
             # print(f'--{p}: {self.hands[p]}')
@@ -300,7 +328,7 @@ class Game:
             r = GameRound(self.tbl, rnd)
             for p in range(1, self.players + 1):
                 r.init_trail(p, in_difficulty)
-            r.calc_hands()
+            r.aftermath()
 
     def end(self):
         final_scores = dict(sorted(self.tbl.scores.items(), key=lambda item: item[1]))
