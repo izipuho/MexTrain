@@ -14,8 +14,8 @@ Home project for OOP learning on the base of Mexican train board game
    7. start new round.
 
 ## TODOs:
-- [ ] Add Player class.
-- [ ] Add init move. Look for TODO.
+- [ ] Add Player class. /add-player
+- [ ] Add init move. Look for TODO. /fix-second-level-init-trail
 * Add second-level difficulty. Look for TODO.
   - [ ] Fix init trails.
   - [ ] Add to turn.
