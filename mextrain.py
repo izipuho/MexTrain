@@ -165,6 +165,7 @@ class GameRound:
                         init_number = -1
                         break
         elif difficulty in ('normal', 'n', '1', 1):
+            # TODO
             # max based without doubles
             i = 0
             while len(hand) != 0 and init_number != -1 and i < 100:
@@ -220,6 +221,7 @@ class GameRound:
         print(f'Current hand: {hand}')
         possible_moves = {'tiles': dict(), 'nums': dict(), 'possible_tiles': [], 'possible_cnt': 0}
         if self.moves != 0 and self.table.layout['trails'][player][0] != 'Empty':
+            # TODO init move
             # technically open self trail for this turn if it is not initial turn
             self.table.layout['trails'][player][0] = 'Opened'
 
