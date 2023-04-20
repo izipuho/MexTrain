@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import random
 import TileSet
+from Player import Player
 
 # in_max_tile = int(input('What is the maximum tile: '))
 # in_players_count = int(input('How many players are we awaiting: '))
@@ -10,21 +11,30 @@ in_players_count = 3
 in_difficulty = 'easy'
 
 class Table:
-    def __init__(self, players):
-        self.players = players
+    def __init__(self, players_count):
+        self.players = [] #players
+        for pl in range(1, players_count + 1):
+            in_player_name = input('Player name: ')
+            print('Choose player difficulty:')
+            print('\t[1] for easy.')
+            print('\t[2] for normal.')
+            print('\t[3] for hard.')
+            print('\t[0] for manual.')
+            in_player_dfctl = input('...')
+            self.players.append(Player(in_player_name, in_player_dfctl))
         self.tile_set = TileSet.Set(in_max_tile)
         # self.dealing_set = self.tile_set.set.copy()
         self.max_tile = self.tile_set.max_tile
         # self.table_tile_cnt = len(self.tile_set.set)
         # Set hand tile_count. Not by the rules, but why not to make it?
         self.hand_tile_cnt = self.tile_set.max_tile  # in_max_tile#12
-        if self.players == 2:
+        if len(self.players) == 2:
             self.hand_tile_cnt += 3
 
         print(self.tile_set)
         # init scores
         self.scores = dict()
-        for p in range(1, self.players + 1):
+        for p in range(1, len(self.players) + 1):
             self.scores[p] = 0
         self.scores['Table'] = 0
         self.layout = {
@@ -76,22 +86,22 @@ class Table:
         trails = self.layout['trails']
         init_tile = hands['Table'][f'{round_num}-{round_num}']
         del hands['Table'][init_tile.code]
-        for p in range(1, self.players + 1):
+        for p in range(1, len(self.players) + 1):
             hands[p] = dict()
             trails[p] = ['Empty', dict()]
         trails['Table'] = ['Opened', {init_tile.code: init_tile}]
         # deal
         for t in range(0, self.hand_tile_cnt):
-            for p in range(1, self.players + 1):
+            for p in range(1, len(self.players) + 1):
                 self.draw(p)
         # table_tile_cnt = len(hands['Table'])
-        # print(f'Dealt {self.hand_tile_cnt} tiles for {self.players} players.')
+        # print(f'Dealt {self.hand_tile_cnt} tiles for {len(self.players)} players.')
         # print(f'Got {table_tile_cnt} tiles left on table and {[round, round]} is starting tile.\n')
         # self.layout = {'hands': hands, 'trails': trails, 'moves': 0, 'round': [round_num, 'Dealt']}
         self.layout['round'] = [round_num, 'Dealt']
 
     def __str__(self):
-        table_str = f'We have {self.players} players at the table'
+        table_str = f'We have {len(self.players)} players at the table'
         if self.layout['round'][1] == 'Started':
             pass  # table_str += '. No tiles are dealt.'
         else:
@@ -104,7 +114,7 @@ class Table:
         if self.layout['round'][1] != 'Dealt':
             # print('Table is set. We have trails.')
             layout_repr = 'Trails are:\n'
-            for p in range(1, self.players + 1):
+            for p in range(1, len(self.players) + 1):
                 layout_repr += f"\tPlayer {p} has trail:\n"
                 layout_repr += f"\t\t{self.layout['trails'][p][1]} and it is {self.layout['trails'][p][0].lower()}.\n"
         else:
@@ -125,7 +135,7 @@ class GameRound:
         print(self.table)
 
     def play(self):
-        for player in range(1, self.table.players + 1):
+        for player in range(1, len(self.table.players) + 1):
             self.init_trail(player, in_difficulty)
             if len(self.table.layout['hands'][player]) == 0:
                 print(f'Player {player} put all tiles to initial trail. Round {self.num} is over.')
@@ -215,7 +225,7 @@ class GameRound:
 
     def turn(self, difficulty):
         # TODO ugly
-        player = (self.moves - 1) % self.table.players + 1
+        player = (self.moves - 1) % len(self.table.players) + 1
         print(f"Turn {self.moves}. Player {player}.")
         hand = self.table.layout['hands'][player]
         print(f'Current hand: {hand}')
@@ -321,7 +331,7 @@ class GameRound:
 class Game:
     def __init__(self, players, rounds=None):
         self.players = players
-        self.table = Table(self.players)
+        self.table = Table(len(self.players))
         self.first_player = random.randint(1, 4)
         if rounds:
             print(f'Game will last for {rounds} rounds. Final round is {self.table.max_tile - rounds}.\n')
@@ -329,7 +339,7 @@ class Game:
         # print(f'--Final round: {self.table.max_tile - (rounds or 0) + 1}')
         for rnd in range(self.table.max_tile, self.table.max_tile - (rounds or 0), -1):
             gr = GameRound(self.table, rnd)
-            for p in range(1, self.players + 1):
+            for p in range(1, len(self.players) + 1):
                 gr.init_trail(p, in_difficulty)
             gr.moves += 1
 
