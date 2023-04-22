@@ -214,16 +214,17 @@ class GameRound:
                 i += 1
         self.table.layout['trails'][player_num][1] = trail
         if len(trail) == 0:
-            print(f'\tPlayer {player.name} has no trail')
+            print(f'\t{player.name} has no trail')
             self.table.layout['trails'][player_num][0] = 'Empty'
         elif len(trail) == self.table.hand_tile_cnt:
-            print(f'\tPlayer {player.name} set all tiles to init trail: {list(trail.values())}')
+            print(f'\t{player.name} set all tiles to init trail: {list(trail.values())}')
             self.is_round_finished = True
         else:
             self.table.layout['trails'][player_num][0] = 'Closed'
-            print(f'\tPlayer {player.name} has init trail {len(trail)} tiles long: {list(trail.values())}')
+            print(f'\t{player.name} has init trail {len(trail)} tiles long: {list(trail.values())}')
         if self.is_round_finished:
             self.table.layout['round'][1] = 'End'
+            print(f'{player.name} has no tiles left. Do aftermath.')
         else:
             self.table.layout['round'][1] = 'Init trails'
         print('\n')
@@ -234,7 +235,7 @@ class GameRound:
         player = self.table.players[player_num]
         print(f"Turn {self.moves}. Player {player.name}.")
         hand = self.table.layout['hands'][player_num]
-        print(f'Current hand: {hand}')
+        print(f'Current hand: {list(hand.values())}')
         possible_moves = {'tiles': dict(), 'nums': dict(), 'possible_tiles': [], 'possible_cnt': 0}
         if self.moves != 0 and self.table.layout['trails'][player_num][0] != 'Empty':
             # TODO init move
@@ -262,7 +263,7 @@ class GameRound:
         if possible_moves['possible_cnt'] == 0 and len(self.table.layout['hands']['Table']) != 0:
             self.table.draw(player_num)
             new_tile = list(self.table.layout['hands'][player_num].values())[-1]
-            print(f'\tPlayer {player.name} drew a tile from table.')
+            print(f'\t{player.name} drew a tile from table.')
             # print(f"--Drew {repr(new_tile)}")
             is_new_tile_suitable = False
             for p, n in possible_moves['nums'].items():
@@ -328,9 +329,9 @@ class GameRound:
                 print(f'{len(hands[p])} tiles undealt for {final_score} points.\n')
             else:
                 if final_score == 0:
-                    print(f'Player {p} has no tiles left in hand and scores {final_score}.\n')
+                    print(f'{self.table.players[p].name} has no tiles left in hand and scores {final_score}.\n')
                 else:
-                    print(f'Player {p} has {len(hands[p])} tiles left in hand and scores {final_score}.')
+                    print(f'{self.table.players[p].name} has {len(hands[p])} tiles left in hand and scores {final_score}.')
                     print(f'\tHis tiles: {hands[p].values()}\n')
 
 
