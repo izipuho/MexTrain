@@ -14,10 +14,10 @@ class Tile:
 
     def is_double(self):
         if self.numbers[0] == self.numbers[1]:
-            print(f'{self.numbers} is double.')
+            # print(f'{self.numbers} is double.')
             return True
         else:
-            print(f'{self.numbers} not a double.')
+            # print(f'{self.numbers} not a double.')
             return False
 
     def flip(self):
