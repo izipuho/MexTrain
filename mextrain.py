@@ -169,31 +169,31 @@ class GameRound:
             # max based without doubles
             i = 0
             while len(hand) != 0 and init_number != -1 and i < 100:
-                print(f'Hand tile count: {len(hand)}')
-                print(f'Looking for {init_number}')
+                # print(f'Hand tile count: {len(hand)}')
+                # print(f'Looking for {init_number}')
                 second_number = -1
                 for t in hand.values():
-                    print(f'Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
+                    # print(f'Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
                     if t.is_suitable(init_number):
-                        print(f'{repr(t)} is ok')
+                        # print(f'{repr(t)} is ok')
                         # TODO something bad with this breaking loop
                         if t.is_double():
-                            print('Double is always good. Take it.')
+                            # print('Double is always good. Take it.')
                             good_tile = t
                             second_number = t.numbers[1]
                         elif second_number < t.numbers[1]:
-                            print('More is better. Changed tile')
+                            # print('More is better. Changed tile')
                             good_tile = t
                             second_number = t.numbers[1]
                         else:
-                            print('Old one is good')
+                            # print('Old one is good')
                             pass
                 init_number = second_number
                 # TODO I don't like the good_tile
                 if second_number != -1:
                     hand.pop(good_tile.code)
                     trail[good_tile.code] = good_tile
-                    print(f'We take {repr(good_tile)} to trail.\n')
+                    # print(f'We take {repr(good_tile)} to trail.\n')
                 else:
                     break
                 i += 1
@@ -219,7 +219,7 @@ class GameRound:
         print(f"Turn {self.moves}. Player {player}.")
         hand = self.table.layout['hands'][player]
         print(f'Current hand: {hand}')
-        possible_moves = {'tiles': dict(), 'nums': dict(), 'possible_tiles': [], 'possible_cnt': 0}
+        possible_moves = {'trails': dict(), 'nums': dict(), 'possible_tiles': dict(), 'possible_cnt': 0}
         if self.moves != 0 and self.table.layout['trails'][player][0] != 'Empty':
             # TODO init move
             # technically open self trail for this turn if it is not initial turn
@@ -228,8 +228,9 @@ class GameRound:
         # Look for opened trails
         for p, trail in self.table.layout['trails'].items():
             if trail[0] == 'Opened':
-                possible_moves['tiles'][p] = list(trail[1].values())[-1]
-                possible_moves['nums'][p] = possible_moves['tiles'][p].numbers[1]  # trail[1][-1][1]
+                possible_moves['trails'][p] = list(trail[1].values())[-1]
+                possible_moves['nums'][p] = possible_moves['trails'][p].numbers[1]  # trail[1][-1][1]
+                possible_moves['possible_tiles'][p] = []
             elif trail[0] in ('Empty', 'Closed'):
                 pass
         # Look for possible tiles
@@ -239,9 +240,9 @@ class GameRound:
                 # print(f'--Checkin out if tile {t} suits for {n}')
                 if t.is_suitable(n):
                     # print(f'Found possible tile: {t}')
-                    possible_moves['possible_tiles'].append(t)
+                    possible_moves['possible_tiles'][p].append(t)
                     possible_moves['possible_cnt'] += 1
-        # print(f'Possible moves are {possible_moves}')
+        print(f'--Possible moves are {possible_moves}')
         # Draw if no possible tiles and check it
         if possible_moves['possible_cnt'] == 0 and len(self.table.layout['hands']['Table']) != 0:
             self.table.draw(player)
@@ -269,28 +270,44 @@ class GameRound:
             print(f'\tNo tiles left on self.table to draw. Open trail {player}.')
             if self.table.layout['trails'][player][0] != 'Empty':
                 self.table.layout['trails'][player][0] = 'Opened'
+        # Put tile from hand to some trail
         else:
-            for t in possible_moves['possible_tiles']:
-                if difficulty in ('easy', 'e', '0', 0):
+            end_turn = False
+            if difficulty in ('easy', 'e', '0', 0):
+                for p, tiles in possible_moves['possible_tiles'].items():
                     # by order
-                    end_turn = False
-                    for p, n in possible_moves['nums'].items():
-                        if t.is_suitable(n):
-                            print(f'Put {repr(t)} in trail {p}')
-                            self.table.move_tile(t, ['hand', player], ['trail', p])
-                            if p != 'Table':
-                                print(f'\tClose trail {p}.')
-                                if self.table.layout['trails'][p][0] != 'Empty':
-                                    self.table.layout['trails'][p][0] = 'Closed'
-                            end_turn = True
+                    if len(tiles) != 0:
+                        print(f'Put {repr(tiles[0])} in trail {p}')
+                        self.table.move_tile(tiles[0], ['hand', player], ['trail', p])
+                        if p != 'Table':
+                            print(f'\tClose trail {p}.')
+                            if self.table.layout['trails'][p][0] != 'Empty':
+                                self.table.layout['trails'][p][0] = 'Closed'
+                        end_turn = True
+                        break
+
+                        if end_turn:
+                            self.table.layout['trails'][player][0] = 'Closed'
                             break
-                elif difficulty in ('normal', 'n', '1', 1):
-                    # by weight
-                    # TODO
-                    pass
-                if end_turn:
-                    self.table.layout['trails'][player][0] = 'Closed'
-                    break
+            elif difficulty in ('normal', 'n', '1', 1):
+                # by weight
+                second_number = -1
+                for p, tiles in possible_moves['possible_tiles'].items():
+                    for tile in tiles:
+                        # print(f'Checking out {repr(tile)}.')
+                        if tile.is_double():
+                            # print('Double is always good. Take it.')
+                            good_tile = [tile, p]
+                            break
+                        elif tile.numbers[1] > second_number:
+                            # print('More is better.')
+                            second_number = tile.numbers[1]
+                            good_tile = [tile, p]
+                        else:
+                            pass
+                print(f'Put {repr(good_tile[0])} in trail {good_tile[1]}')
+                self.table.move_tile(good_tile[0], ['hand', player], ['trail', good_tile[1]])
+
         if len(self.table.layout['hands'][player]) == 0:
             print(f'Player {player} has no tile left in hand. Round {self.num} is over.')
             self.is_round_finished = True
