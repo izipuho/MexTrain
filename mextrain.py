@@ -259,7 +259,7 @@ class GameRound:
                     # print(f'Found possible tile: {t}')
                     possible_moves['possible_tiles'][p].append(t)
                     possible_moves['possible_cnt'] += 1
-        print(f'--Possible moves are {possible_moves}')
+        # print(f'--Possible moves are {possible_moves}')
         # Draw if no possible tiles and check it
         if possible_moves['possible_cnt'] == 0 and len(self.table.layout['hands']['Table']) != 0:
             self.table.draw(player_num)
@@ -303,10 +303,10 @@ class GameRound:
                         end_turn = True
                         break
 
-                        if end_turn:
-                            self.table.layout['trails'][player][0] = 'Closed'
-                            break
-            elif difficulty in ('normal', 'n', '1', 1):
+                    if end_turn:
+                        self.table.layout['trails'][player][0] = 'Closed'
+                        break
+            elif player.difficulty == 'normal':
                 # by weight
                 second_number = -1
                 for p, tiles in possible_moves['possible_tiles'].items():
@@ -323,10 +323,10 @@ class GameRound:
                         else:
                             pass
                 print(f'Put {repr(good_tile[0])} in trail {good_tile[1]}')
-                self.table.move_tile(good_tile[0], ['hand', player], ['trail', good_tile[1]])
+                self.table.move_tile(good_tile[0], ['hand', player_num], ['trail', good_tile[1]])
 
-        if len(self.table.layout['hands'][player]) == 0:
-            print(f'Player {player} has no tile left in hand. Round {self.num} is over.')
+        if len(self.table.layout['hands'][player_num]) == 0:
+            print(f'Player {player.name} has no tile left in hand. Round {self.num} is over.')
             self.is_round_finished = True
         self.moves += 1
         print('\n')
