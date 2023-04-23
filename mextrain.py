@@ -5,7 +5,7 @@ import TileSet
 # in_max_tile = int(input('What is the maximum tile: '))
 # in_players_count = int(input('How many players are we awaiting: '))
 # in_difficulty = input('What is the difficulty: ')
-in_max_tile = 4
+in_max_tile = 6
 in_players_count = 3
 in_difficulty = 'easy'
 
@@ -172,15 +172,15 @@ class GameRound:
                 print(f'Hand tile count: {len(hand)}')
                 print(f'Looking for {init_number}')
                 second_number = -1
-                for t in hand:
-                    print(f'{hand.index(t) + 1}. Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
+                for t in hand.values():
+                    print(f'Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
                     if t.is_suitable(init_number):
-                        print(f'{t} is ok')
+                        print(f'{repr(t)} is ok')
                         # TODO something bad with this breaking loop
-                        if t.is_double:
+                        if t.is_double():
                             print('Double is always good. Take it.')
                             good_tile = t
-                            break
+                            second_number = t.numbers[1]
                         elif second_number < t.numbers[1]:
                             print('More is better. Changed tile')
                             good_tile = t
@@ -191,8 +191,8 @@ class GameRound:
                 init_number = second_number
                 # TODO I don't like the good_tile
                 if second_number != -1:
-                    hand.remove(good_tile)
-                    trail.append(good_tile)
+                    hand.pop(good_tile.code)
+                    trail[good_tile.code] = good_tile
                     print(f'We take {repr(good_tile)} to trail.\n')
                 else:
                     break
