@@ -87,6 +87,28 @@ class Round:
                 else:
                     break
                 i += 1
+        elif player.difficulty == 'manual':
+            print(f'Starting tile is [{init_number}, {init_number}].')
+            print(f'Your hand: {list(hand.values())}\n')
+            print('Choose tile (text code) to place to trail.')
+            print('\tor [R]eset')
+            print('\tor Enter to end trail:')
+            tile_to_move = input('... ')
+            while len(tile_to_move) > 0:
+                if tile_to_move in list(hand.keys()):
+                    tile_to_move = hand[tile_to_move]
+                    if tile_to_move.is_suitable(init_number):
+                        # self.table.move_tile(tile_to_move, ['hand', player_num], ['home'])
+                        hand.pop(tile_to_move.code)
+                        trail[tile_to_move.code] = tile_to_move
+                        init_number = tile_to_move.numbers[1]
+                        tile_to_move = input(f'Init trail is {list(trail.values())}. Chose next tile: ')
+                    else:
+                        tile_to_move = input(f"You can't place {repr(tile_to_move)} to your trail. Chose another one.")
+                elif tile_to_move in ('R', 'r'):
+                    pass
+                else:
+                    tile_to_move = input(f'{tile_to_move} is not an option. Choose wisely: ')
         self.table.layout['trails'][player_num][1] = trail
         if len(trail) == 0:
             print(f'\t{player.name} has no trail')
@@ -182,6 +204,7 @@ class Round:
                     if end_turn:
                         self.table.layout['trails'][player][0] = 'Closed'
                         break
+            # elif player.difficulty == 'normal':
             elif player.difficulty == 'normal':
                 # by weight
                 second_number = -1
@@ -200,6 +223,25 @@ class Round:
                             pass
                 print(f'Put {repr(good_tile[0])} in trail {good_tile[1]}')
                 self.table.move_tile(good_tile[0], ['hand', player_num], ['trail', good_tile[1]])
+            elif player.difficulty == 'manual':
+                print('Your possible moves are:')
+                i = 1
+                moves = dict()
+                for trail in possible_moves['possible_tiles'].keys():
+                    for tile in possible_moves['possible_tiles'][trail]:
+                        moves[i] = [tile, trail]
+                        print(f'\t[{i}] {repr(tile)} to trail {trail}')
+                        i += 1
+                print(list(moves.keys()))
+                print(moves)
+                current_move = input('Choose your move: ')
+                while len(current_move) >= 0:
+                    if int(current_move) in list(moves.keys()):
+                        print(f'Put {repr(moves[int(current_move)][0])} in trail {moves[int(current_move)][1]}')
+                        self.table.move_tile(moves[int(current_move)][0], ['hand', player_num], ['trail', moves[int(current_move)][1]])
+                        break
+                    else:
+                        current_move = input(f'{current_move} is not an option. Choose wisely: ')
 
         if len(self.table.layout['hands'][player_num]) == 0:
             print(f'Player {player.name} has no tile left in hand. Round {self.num} is over.')
