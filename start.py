@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
-import mextrain
+from Table import Table
+from Game import Game
 
-#tbl = mextrain.Table(3)
-#tbl.deal(6)
-gm = mextrain.Game(3, 2)
+in_max_tile = int(input('Choose game type: 4, 6, 12, 15: '))
+in_players_count = int(input('How many players are we awaiting: '))
+tbl = Table(in_max_tile, in_players_count)
+
+try:
+    in_start_round = int(input(f'Which round we start with (not greater then {in_max_tile}) or press Enter for full game: '))
+except ValueError:
+    in_start_round = in_max_tile
+
+gm = Game(tbl, in_start_round)
+
+gm.end()
