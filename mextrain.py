@@ -50,7 +50,6 @@ class Table:
 
     def move_tile(self, tile, src=[], dst=[]):
     # TODO make some restrictions
-    # TODO make true flip
         # inputs must be:
         # src: ['hand'/'Table', player or None]
         # dst: ['hand'/'trail'/'Table', player]
@@ -185,7 +184,6 @@ class GameRound:
                         init_number = -1
                         break
         elif player.difficulty == 'normal':
-            # TODO
             # max based without doubles
             i = 0
             while len(hand) != 0 and init_number != -1 and i < 100:
@@ -196,7 +194,6 @@ class GameRound:
                     # print(f'Current tile: {t}. Current max number: {second_number}. Looking for init {init_number}.')
                     if t.is_suitable(init_number):
                         # print(f'{repr(t)} is ok')
-                        # TODO something bad with this breaking loop
                         if t.is_double():
                             # print('Double is always good. Take it.')
                             good_tile = t
@@ -243,7 +240,6 @@ class GameRound:
         print(f'Current hand: {list(hand.values())}')
         possible_moves = {'trails': dict(), 'nums': dict(), 'possible_tiles': dict(), 'possible_cnt': 0}
         if len(self.table.layout['trails']['Table'][1]) > 1 and self.table.layout['trails'][player_num][0] != 'Empty':
-            # TODO init move
             # technically open self trail for this turn if it is not initial turn
             self.table.layout['trails'][player_num][0] = 'Opened'
         elif len(self.table.layout['trails']['Table'][1]) == 0:
