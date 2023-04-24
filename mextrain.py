@@ -21,6 +21,11 @@ class Table:
             print('\t[3] for hard')
             print('\t[0] for manual')
             in_player_dfctl = input('...')
+            if in_player_dfctl in ('3', '0'):
+                print(f'Difficulty {in_player_dfctl} under construction. Will be 2 (normal).')
+                in_player_dfctl = 2
+            elif in_player_dfctl not in ('1', '2'):
+                in_player_dfctl = input('Choose difficulty from listed above...')
             self.players[pl] = Player(in_player_name, in_player_dfctl)
         self.tile_set = TileSet.Set(in_max_tile)
         # self.dealing_set = self.tile_set.set.copy()
@@ -229,19 +234,20 @@ class GameRound:
             self.table.layout['round'][1] = 'Init trails'
         print('\n')
 
-    def turn(self):
+    def turn(self, player_num):
         # TODO ugly
-        player_num = (self.moves - 1) % len(self.table.players) + 1
+        # player_num = (self.moves - 1) % len(self.table.players) + 1
         player = self.table.players[player_num]
         print(f"Turn {self.moves}. Player {player.name}.")
         hand = self.table.layout['hands'][player_num]
         print(f'Current hand: {list(hand.values())}')
         possible_moves = {'trails': dict(), 'nums': dict(), 'possible_tiles': dict(), 'possible_cnt': 0}
-        if self.moves != 0 and self.table.layout['trails'][player_num][0] != 'Empty':
+        if len(self.table.layout['trails']['Table'][1]) > 1 and self.table.layout['trails'][player_num][0] != 'Empty':
             # TODO init move
             # technically open self trail for this turn if it is not initial turn
             self.table.layout['trails'][player_num][0] = 'Opened'
-
+        elif len(self.table.layout['trails']['Table'][1]) == 0:
+            pass
         # Look for opened trails
         for p, trail in self.table.layout['trails'].items():
             if trail[0] == 'Opened':
@@ -270,7 +276,7 @@ class GameRound:
             for p, n in possible_moves['nums'].items():
                 # print(f'--Checkin out if tile {repr(new_tile)} suits for {n}')
                 if new_tile.is_suitable(n):
-                    print(f'Put new tile to {p}')
+                    print(f'Put new tile ({repr(new_tile)}) to trail {p}.')
                     self.table.move_tile(new_tile, ['hand', player_num], ['trail', p])
                     if p != 'Table':
                         print(f'\tClose trail {p}.')
@@ -294,7 +300,7 @@ class GameRound:
                 for p, tiles in possible_moves['possible_tiles'].items():
                     # by order
                     if len(tiles) != 0:
-                        print(f'Put {repr(tiles[0])} in trail {p}')
+                        print(f'Put {repr(tiles[0])} to trail {p}')
                         self.table.move_tile(tiles[0], ['hand', player_num], ['trail', p])
                         if p != 'Table':
                             print(f'\tClose trail {p}.')
