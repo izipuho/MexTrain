@@ -34,16 +34,18 @@ class Table:
         self.players = dict()
         for pl in range(1, players_count + 1):
             in_player_name = input(f'№{pl} player name: ')
+            if len(in_player_name) == 0:
+                in_player_name = input("Name can't be empty.")
             print('Choose player difficulty:')
             print('\t[1] for easy')
             print('\t[2] for normal')
             print('\t[3] for hard')
             print('\t[0] for manual')
-            in_player_difficulty = input('...')
-            if in_player_difficulty in ('3', '0'):
+            in_player_difficulty = input('... ')
+            if in_player_difficulty in ('3', ):
                 print(f'Difficulty {in_player_difficulty} under construction. Will be 2 (normal).')
                 in_player_difficulty = 2
-            elif in_player_difficulty not in ('1', '2'):
+            elif in_player_difficulty not in ('1', '2', '0'):
                 in_player_difficulty = input('Choose difficulty from listed above...')
             self.players[pl] = Player(in_player_name, in_player_difficulty)
         self.tile_set = TileSet.Set(max_tile)
@@ -88,6 +90,7 @@ class Table:
                 raise Exception('Determine source player')
             if dst[0] == 'trail':
                 if tile.is_suitable(list(self.layout['trails'][dst[1]][1].values())[-1].numbers[1]):
+                    self.layout['trails'][dst[1]][0] = 'Closed'
                     self.layout['trails'][dst[1]][1].update({tile.code: tile})
             elif dst[0] == 'Table':
                 if tile.is_suitable(list(self.layout['trails']['Table'][1].values())[-1].numbers[1]):
