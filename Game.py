@@ -122,6 +122,7 @@ class Round:
                     trail = dict()
                     print(f'Your hand: {list(hand.values())}\n')
                     tile_to_move = input('Choose tile to place to trail: ')
+                    init_number = self.num
                 elif tile_to_move in ('U', 'u', 'undo') and len(trail) > 0:
                     undo_tile = list(trail.values())[-1]
                     hand[undo_tile.code] = undo_tile

@@ -3,7 +3,12 @@ from Table import Table
 from Game import Game
 
 in_max_tile = int(input('Choose game type: 4, 6, 12, 15: '))
-in_players_count = int(input('How many players are we awaiting: '))
+if in_max_tile not in (4, 6, 9, 12, 15):
+    in_max_tile = int(input('Choose game type: 4, 6, 12, 15: '))
+try:
+    in_players_count = int(input('How many players are we awaiting: '))
+except ValueError:
+    in_players_count = int(input('Not an integer!!! Try again: '))
 tbl = Table(in_max_tile, in_players_count)
 
 try:
